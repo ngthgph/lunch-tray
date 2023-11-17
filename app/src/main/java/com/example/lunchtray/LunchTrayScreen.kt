@@ -19,6 +19,8 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -32,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -83,7 +86,8 @@ fun LunchTrayAppBar(
 }
 
 @Composable
-fun LunchTrayApp() {
+fun LunchTrayApp(
+) {
     // TODO: Create Controller and initialization
     val navController: NavHostController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -102,7 +106,8 @@ fun LunchTrayApp() {
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigationUp = { navController.navigateUp() },
             )
-        }
+        },
+        modifier= Modifier.padding(dimensionResource(id = R.dimen.padding_medium))
     ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
 
@@ -110,7 +115,6 @@ fun LunchTrayApp() {
         NavHost(
             navController = navController,
             startDestination = LunchTrayScreen.Start.name,
-            modifier = Modifier.padding(innerPadding),
             )
         {
             composable(LunchTrayScreen.Start.name) {
@@ -118,7 +122,9 @@ fun LunchTrayApp() {
                     onStartOrderButtonClicked = {
                     navController.navigate(LunchTrayScreen.Entree.name)
                     },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
                 )
             }
             composable(LunchTrayScreen.Entree.name) {
@@ -127,7 +133,9 @@ fun LunchTrayApp() {
                     onCancelButtonClicked = { cancelOrderAndNavigateToStart(viewModel, navController) },
                     onNextButtonClicked = { navController.navigate(LunchTrayScreen.SideDish.name) },
                     onSelectionChanged = { viewModel.updateEntree(it) },
-                    modifier = Modifier.fillMaxHeight()
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .verticalScroll(rememberScrollState())
                 )
             }
             composable(LunchTrayScreen.SideDish.name) {
@@ -136,7 +144,9 @@ fun LunchTrayApp() {
                     onCancelButtonClicked = { cancelOrderAndNavigateToStart(viewModel, navController) },
                     onNextButtonClicked = { navController.navigate(LunchTrayScreen.Accompaniment.name) },
                     onSelectionChanged = { viewModel.updateSideDish(it) },
-                    modifier = Modifier.fillMaxHeight()
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .verticalScroll(rememberScrollState())
                 )
             }
             composable(LunchTrayScreen.Accompaniment.name) {
@@ -145,7 +155,9 @@ fun LunchTrayApp() {
                     onCancelButtonClicked = { cancelOrderAndNavigateToStart(viewModel, navController) },
                     onNextButtonClicked = { navController.navigate(LunchTrayScreen.CheckOut.name) },
                     onSelectionChanged = { viewModel.updateAccompaniment(it) },
-                    modifier = Modifier.fillMaxHeight()
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .verticalScroll(rememberScrollState())
                 )
             }
             composable(LunchTrayScreen.CheckOut.name) {
@@ -153,7 +165,12 @@ fun LunchTrayApp() {
                     orderUiState = uiState,
                     onNextButtonClicked = { cancelOrderAndNavigateToStart(viewModel, navController) },
                     onCancelButtonClicked = { cancelOrderAndNavigateToStart(viewModel, navController) },
-                    modifier = Modifier.fillMaxHeight()
+                    modifier = Modifier.padding(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = innerPadding.calculateBottomPadding(),
+                        start = dimensionResource(id = R.dimen.padding_medium),
+                        end = dimensionResource(id = R.dimen.padding_medium)
+                    )
                 )
             }
         }
